@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Construis ta fusée</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #0d1b2a;
+      color: white;
+      text-align: center;
+      padding: 2rem;
+    }
+    .card {
+      background-color: #1b263b;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      margin: 1rem auto;
+      max-width: 600px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+    button {
+      margin: 0.5rem;
+      padding: 0.7rem 1.2rem;
+      border: none;
+      border-radius: 0.5rem;
+      background-color: #415a77;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    button:hover {
+      background-color: #778da9;
+      transform: scale(1.05);
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      margin: 1rem 0;
+      border-radius: 1rem;
+    }
+    .fade-in {
+      animation: fadeIn 1s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    #countdown {
+      font-size: 3rem;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>🚀 Construis ta fusée !</h1>
+  <div class="card fade-in" id="question-card">
+    <img id="question-img" src="" alt="Illustration de la question" style="display: none;">
+    <p id="question">Quel type de mission choisis-tu ?</p>
+    <div id="choices"></div>
+  </div>
+  <div class="card fade-in" id="result-card" style="display: none;">
+    <h2>Résultat de ta mission</h2>
+    <div id="countdown"></div>
+    <p id="result-text"></p>
+    <img id="result-img" src="" alt="Résultat visuel">
+  </div>
+
+  <audio id="launch-sound" src="https://www.soundjay.com/mechanical/sounds/rocket-launch-01.mp3"></audio>
+  <audio id="explosion-sound" src="https://www.soundjay.com/explosion/sounds/explosion-01.mp3"></audio>
+
+  <script>
+    const questions = [
+      {
+        question: "Quel type de mission choisis-tu ?",
+        image: "https://upload.wikimedia.org/wikipedia/commons/2/2c/STS-132_launch.jpg",
+        choices: ["Satellite", "Mission lunaire", "Colonisation de Mars"]
+      },
+      {
+        question: "Quel moteur utilises-tu ?",
+        image: "https://upload.wikimedia.org/wikipedia/commons/2/29/RS-25_Space_Shuttle_Main_Engine_Test_Firing.jpg",
+        choices: ["Solide", "Liquide", "Ionique"]
+      },
+      {
+        question: "Quel carburant choisis-tu ?",
+        image: "https://upload.wikimedia.org/wikipedia/commons/e/e4/Apollo_11_Saturn_V.jpg",
+        choices: ["Kérosène", "Hydrogène liquide", "Méthane"]
+      },
+      {
+        question: "Combien d'étages ?",
+        image: "https://upload.wikimedia.org/wikipedia/commons/e/e0/Delta_IV_Medium_launch.jpg",
+        choices: ["1 étage", "2 étages", "3 étages"]
+      },
+      {
+        question: "Quel système de guidage utilises-tu ?",
+        image: "https://upload.wikimedia.org/wikipedia/commons/3/36/Flight_director.jpg",
+        choices: ["Manuel", "Automatique", "IA intelligente"]
+      }
+    ];
+
+    const results = [
+      {
+        text: "Ta fusée a explosé au décollage ! 💥",
+        img: "https://upload.wikimedia.org/wikipedia/commons/f/fd/Antares_rocket_explosion_October_28%2C_2014.jpg",
+        sound: "explosion"
+      },
+      {
+        text: "Tu es resté en orbite terrestre 🌍",
+        img: "https://upload.wikimedia.org/wikipedia/commons/e/e6/ISS_Expedition_66_patch.png",
+        sound: "launch"
+      },
+      {
+        text: "Tu as atteint la Lune 🌕 ! Félicitations !",
+        img: "https://upload.wikimedia.org/wikipedia/commons/5/59/Apollo_11_Lunar_Module_on_the_Moon.jpg",
+        sound: "launch"
+      },
+      {
+        text: "Mars est désormais ta nouvelle maison 🪐",
+        img: "https://upload.wikimedia.org/wikipedia/commons/0/02/Mars_23_aug_2003_hubble.jpg",
+        sound: "launch"
+      }
+    ];
+
+    let current = 0;
+    let score = 0;
+
+    function showQuestion() {
+      const q = questions[current];
+      document.getElementById("question").textContent = q.question;
+      const img = document.getElementById("question-img");
+      img.src = q.image;
+      img.style.display = "block";
+      const choicesDiv = document.getElementById("choices");
+      choicesDiv.innerHTML = "";
+
+      q.choices.forEach((choice, index) => {
+        const btn = document.createElement("button");
+        btn.textContent = choice;
+        btn.onclick = () => nextQuestion(index);
+        choicesDiv.appendChild(btn);
+      });
+    }
+
+    function nextQuestion(choiceIndex) {
+      score += choiceIndex;
+      current++;
+      if (current < questions.length) {
+        showQuestion();
+      } else {
+        showCountdown();
+      }
+    }
+
+    function showCountdown() {
+      document.getElementById("question-card").style.display = "none";
+      document.getElementById("result-card").style.display = "block";
+
+      let count = 3;
+      const countdownEl = document.getElementById("countdown");
+      countdownEl.textContent = count;
+
+      const countdown = setInterval(() => {
+        count--;
+        if (count > 0) {
+          countdownEl.textContent = count;
+        } else {
+          clearInterval(countdown);
+          countdownEl.textContent = "Décollage ! 🚀";
+          showResult();
+        }
+      }, 1000);
+    }
+
+    function showResult() {
+      const result = results[Math.min(score, results.length - 1)];
+      document.getElementById("result-text").textContent = result.text;
+      document.getElementById("result-img").src = result.img;
+
+      if (result.sound === "launch") {
+        document.getElementById("launch-sound").play();
+      } else {
+        document.getElementById("explosion-sound").play();
+      }
+    }
+
+    showQuestion();
+  </script>
+</body>
+</html>
