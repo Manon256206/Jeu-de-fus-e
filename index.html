@@ -1,7 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Construis ta fusée</title>
   <style>
     body {
@@ -65,6 +67,7 @@
     <div id="countdown"></div>
     <p id="result-text"></p>
     <img id="result-img" src="" alt="Résultat visuel">
+    <button onclick="restartGame()">🔁 Rejouer</button>
   </div>
 
   <audio id="launch-sound" src="https://www.soundjay.com/mechanical/sounds/rocket-launch-01.mp3"></audio>
@@ -101,22 +104,22 @@
 
     const results = [
       {
-        text: "Ta fusée a explosé au décollage ! 💥",
+        text: "Ta fusée a explosé au décollage ! 💥\n\n💡 Peut-être as-tu choisi un moteur trop instable ou un mauvais carburant ?",
         img: "https://upload.wikimedia.org/wikipedia/commons/f/fd/Antares_rocket_explosion_October_28%2C_2014.jpg",
         sound: "explosion"
       },
       {
-        text: "Tu es resté en orbite terrestre 🌍",
+        text: "Tu es resté en orbite terrestre 🌍\n\n🔄 Ton moteur était trop faible ou tu avais trop de masse embarquée.",
         img: "https://upload.wikimedia.org/wikipedia/commons/e/e6/ISS_Expedition_66_patch.png",
         sound: "launch"
       },
       {
-        text: "Tu as atteint la Lune 🌕 ! Félicitations !",
+        text: "Tu as atteint la Lune 🌕 ! Félicitations !\n\n🚀 Un bon équilibre propulsion/masse. Atterrissage lunaire réussi !",
         img: "https://upload.wikimedia.org/wikipedia/commons/5/59/Apollo_11_Lunar_Module_on_the_Moon.jpg",
         sound: "launch"
       },
       {
-        text: "Mars est désormais ta nouvelle maison 🪐",
+        text: "Mars est désormais ta nouvelle maison 🪐\n\n👨‍🚀 Mission réussie grâce à des choix judicieux !",
         img: "https://upload.wikimedia.org/wikipedia/commons/0/02/Mars_23_aug_2003_hubble.jpg",
         sound: "launch"
       }
@@ -177,11 +180,18 @@
       document.getElementById("result-text").textContent = result.text;
       document.getElementById("result-img").src = result.img;
 
-      if (result.sound === "launch") {
-        document.getElementById("launch-sound").play();
-      } else {
-        document.getElementById("explosion-sound").play();
-      }
+      // Déclencher le son après interaction
+      const audio = result.sound === "launch" ? document.getElementById("launch-sound") : document.getElementById("explosion-sound");
+      audio.currentTime = 0;
+      audio.play().catch(e => console.log("Lecture audio bloquée : interaction requise", e));
+    }
+
+    function restartGame() {
+      current = 0;
+      score = 0;
+      document.getElementById("result-card").style.display = "none";
+      document.getElementById("question-card").style.display = "block";
+      showQuestion();
     }
 
     showQuestion();
